@@ -33,10 +33,17 @@ class Opossum:
 
 	def move(self, tiles):
 		self.rect.x += self.move_speed * self.move_dir_mult
+
 		if collision_test(self.rect, tiles):
 			self.move_dir_mult *= -1
 
 		if self.on_ground:
+			ground_check_rect = self.rect.copy()
+			ground_check_rect.x += OPOSSUM_WIDTH
+			ground_check_rect.y += OPOSSUM_HEIGHT
+			hit_list = collision_test(ground_check_rect, tiles)
+			if not hit_list:
+				self.move_dir_mult *= -1
 			return
 
 		self.rect.y += 16
