@@ -2,7 +2,6 @@ import pygame
 from random import randint
 
 from utils import foreach
-
 from global_path import *
 
 
@@ -41,8 +40,8 @@ def render_map(display, scroll):
 			if tile in tile_dict:
 				display.blit(tile_dict[tile], scrolledPos)	
 
-			if tile != NONE:
-				tile_rects.append(pygame.Rect(pos[0], pos[1], TILE_SIZE, TILE_SIZE))
+				if tile != NONE:
+					tile_rects.append(pygame.Rect(pos[0], pos[1], TILE_SIZE, TILE_SIZE))
 
 			x += 1
 

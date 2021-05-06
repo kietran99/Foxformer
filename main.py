@@ -7,7 +7,9 @@ from utils import foreach
 from animation import *
 from map import *
 from player import *
+from entity import *
 from enemy import *
+from item import *
 
 
 
@@ -22,14 +24,18 @@ pygame.display.set_caption('Foxformer')
 window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION))
 
-opossum_list = [Opossum((208, 80))]
+entities_map = load_map('maps/entities')
+
+# enemies = [Opossum((208, 80))]
+
 player = Player()
+enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
 
 def reset_game():
 	player = Player()
-	opossum_list = [Opossum((208, 80))]
+	enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
 
-	return player, opossum_list
+	return player, enemies, items
 
 while True:
 	display.fill((146, 244, 255))
@@ -71,23 +77,19 @@ while True:
 	player_img_id = animation_db[player.action][player.frame]
 	player_img = animation_frames[player_img_id]
 
-	killed_player = False
-	for opossum in opossum_list:
-		opossum.move(tile_rects)
-		bind_render_input(opossum.render)
-		if opossum.test_player_collision(player.rect) == KILLED_PLAYER:
-			player, opossum_list = reset_game()
-			killed_player = True
-			break
+	dead_enemies, killed_player = enemies_update(enemies, tile_rects, player.rect, display, scroll)
 
 	if killed_player:
+		player, enemies, items = reset_game()
 		continue
 
-	opossum_list = [opossum for opossum in opossum_list if opossum.test_player_collision(player.rect) != GET_KILLED]
+	foreach(lambda killed: enemies.remove(killed), dead_enemies)
+
+	obtains = items_update(items, player.rect, display, scroll)
+	foreach(lambda obtained: items.remove(obtained), obtains)
 
 	player_pos = (player.rect.x - scroll[0] - PLAYER_SPRITE_OFFSET[0], player.rect.y - scroll[1] - PLAYER_SPRITE_OFFSET[1])
 	display.blit(pygame.transform.flip(player_img, player.flip, False), player_pos)
-	
 	# debug_rect = pygame.Rect(player.rect.x - scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height)
 	# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
 

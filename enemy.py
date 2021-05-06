@@ -8,15 +8,34 @@ from map import *
 
 
 
-
 OPOSSUM_WIDTH = 35
 OPOSSUM_HEIGHT = 24
 OPOSSUM_SPRITE_OFFSET = (0, 2)
 
-PLAYER_DMG_TOP_OFFSET = 26
+PLAYER_DMG_TOP_OFFSET = 27
+
 NOT_COLLIDE = 0
 KILLED_PLAYER = 1
 GET_KILLED = 2
+
+
+
+def enemies_update(enemies, tile_rects, player_rect, display, scroll):
+	killed_player = False
+	dead_enemies = []
+	for enemy in enemies:
+		enemy.move(tile_rects)
+		collision_res = enemy.test_player_collision(player_rect)
+		if collision_res == KILLED_PLAYER:		
+			killed_player = True
+			break
+
+		elif collision_res == GET_KILLED:
+			dead_enemies.append(enemy)
+
+		enemy.render(display, scroll)
+
+	return dead_enemies, killed_player
 
 class Opossum:
 	def __init__(self, pos):
@@ -25,9 +44,7 @@ class Opossum:
 		# self.pivot_x = pos[0]
 		self.move_dir_mult = 1
 		self.rect = pygame.Rect(pos[0], pos[1], OPOSSUM_WIDTH, OPOSSUM_HEIGHT)
-		# self.sprite = pygame.image.load(sprites_root + 'opossum/opossum_0.png')
 		self.flip = False
-		self.on_ground = False
 		self.action = 'RUN'
 		self.frame = 0
 
@@ -37,19 +54,12 @@ class Opossum:
 		if collision_test(self.rect, tiles):
 			self.move_dir_mult *= -1
 
-		if self.on_ground:
-			ground_check_rect = self.rect.copy()
-			ground_check_rect.x += OPOSSUM_WIDTH
-			ground_check_rect.y += OPOSSUM_HEIGHT
-			hit_list = collision_test(ground_check_rect, tiles)
-			if not hit_list:
-				self.move_dir_mult *= -1
-			return
-
-		self.rect.y += 16
-		hit_list = collision_test(self.rect, tiles)
-		self.rect.bottom = hit_list[0].top
-		self.on_ground = True
+		ground_check_rect = self.rect.copy()
+		ground_check_rect.x += OPOSSUM_WIDTH
+		ground_check_rect.y += OPOSSUM_HEIGHT
+		hit_list = collision_test(ground_check_rect, tiles)
+		if not hit_list:
+			self.move_dir_mult *= -1
 
 		# if abs(self.rect.x - self.pivot_x) > self.move_range:
 
@@ -57,7 +67,9 @@ class Opossum:
 		if not self.rect.colliderect(player_rect):
 			return NOT_COLLIDE
 
-		killed_player = (self.rect.top + PLAYER_DMG_TOP_OFFSET - player_rect.bottom) > (player_rect.right - self.rect.left)
+		cropped_rect = self.rect.clip(player_rect)
+		# print("W: " + str(cropped_rect.width) + " H: " + str(cropped_rect.height))
+		killed_player = cropped_rect.width < cropped_rect.height
 		return KILLED_PLAYER if killed_player else GET_KILLED
 
 	def render(self, display, scroll):
@@ -68,6 +80,10 @@ class Opossum:
 		img_id = opossum_anim_db[self.action][self.frame]
 		sprite = animation_frames[img_id]
 		display.blit(pygame.transform.flip(sprite, self.flip, False), (self.rect.x - scroll[0] - OPOSSUM_SPRITE_OFFSET[0], self.rect.y - scroll[1] - OPOSSUM_SPRITE_OFFSET[1]))
+
+enemies_dict = {
+	'5': lambda pos: Opossum((pos[0] - 0, pos[1] - 7))
+}
 
 opossum_anim_db = {}
 opossum_anim_db['RUN'] = load_anim(sprites_root + 'opossum', [5, 5, 5, 5, 5, 5])
