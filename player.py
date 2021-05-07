@@ -20,8 +20,8 @@ MAX_Y_MOMENTUM = 3
 
 class Player:
 	def __init__(self):
-		self.move_speed = 4
-		self.jump_force = 5
+		self.move_speed = 3
+		self.jump_force = 3.5
 
 		self.moving_right = False
 		self.moving_left = False
@@ -38,6 +38,40 @@ class Player:
 		self.action = IDLE
 		self.frame = 0
 		self.flip = False
+
+		self.sprite = None
+
+	def try_move(self, tile_rects):
+		player_movement = [0, 0]
+		player_movement[0] += self.move_speed if self.moving_right else 0
+		player_movement[0] -= self.move_speed if self.moving_left else 0
+		player_movement[1] += self.y_momentum 
+		self.y_momentum = self.y_momentum + GRAVITY_MOD if self.y_momentum <= MAX_Y_MOMENTUM else MAX_Y_MOMENTUM
+
+		collisions = self.move(player_movement, tile_rects)
+		
+		if collisions['bottom']:
+			self.y_momentum = 0
+			self.air_timer = 0
+			self.on_ground = True
+		elif collisions['top']:
+			self.y_momentum = 0
+			self.air_timer = 0
+		else:
+			self.air_timer += 1
+
+		if player_movement[0] != 0:
+			self.flip = player_movement[0] < 0
+			if self.on_ground:
+				self.action, self.frame = change_action(self.action, self.frame, RUN)
+			else:
+				self.action, self.frame = change_action(self.action, self.frame, JUMP)
+		else:
+			self.action, self.frame = change_action(self.action, self.frame, IDLE)
+
+		self.frame = (self.frame + 1) if self.frame < (len(animation_db[self.action]) - 1) else 0
+		player_img_id = animation_db[self.action][self.frame]
+		self.sprite = animation_frames[player_img_id]
 
 	def move(self, movement, tiles):
 		collision_types = { 'top': False, 'bottom': False, 'right': False, 'left': False }
@@ -64,6 +98,17 @@ class Player:
 				collision_types['top'] = True
 
 		return collision_types
+
+	def try_jump(self):
+		if self.air_timer < EDGE_JUMP_TIME_LIMIT:
+			self.y_momentum = -self.jump_force
+			self.on_ground = False
+
+	def render(self, display, scroll):
+		# debug_rect = pygame.Rect(player.rect.x - scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height)
+		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
+		player_pos = (self.rect.x - scroll[0] - PLAYER_SPRITE_OFFSET[0], self.rect.y - scroll[1] - PLAYER_SPRITE_OFFSET[1])
+		display.blit(pygame.transform.flip(self.sprite, self.flip, False), player_pos)
 
 def calc_scroll(display, player, true_scroll):
 	player.true_scroll[0] += (player.rect.x - player.true_scroll[0] - display.get_width() / 2 + player.rect.width / 2) / camera_smooth_factor

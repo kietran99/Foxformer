@@ -26,16 +26,15 @@ display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTI
 
 entities_map = load_map('maps/entities')
 
-# enemies = [Opossum((208, 80))]
-
-player = Player()
-enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
-
 def reset_game():
 	player = Player()
 	enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
-
 	return player, enemies, items
+
+player, enemies, items = reset_game()
+
+pygame.mixer.music.load('audio/bgm.ogg')
+pygame.mixer.music.play(-1)
 
 while True:
 	display.fill((146, 244, 255))
@@ -46,36 +45,7 @@ while True:
 	bind_render_input(render_bg)
 	tile_rects = bind_render_input(render_map)
 
-	player_movement = [0, 0]
-	player_movement[0] += player.move_speed if player.moving_right else 0
-	player_movement[0] -= player.move_speed if player.moving_left else 0
-	player_movement[1] += player.y_momentum 
-	player.y_momentum = player.y_momentum + GRAVITY_MOD if player.y_momentum <= MAX_Y_MOMENTUM else MAX_Y_MOMENTUM
-
-	collisions = player.move(player_movement, tile_rects)
-	
-	if collisions['bottom']:
-		player.y_momentum = 0
-		player.air_timer = 0
-		player.on_ground = True
-	elif collisions['top']:
-		player.y_momentum = 0
-		player.air_timer = 0
-	else:
-		player.air_timer += 1
-
-	if player_movement[0] != 0:
-		player.flip = player_movement[0] < 0
-		if player.on_ground:
-			player.action, player.frame = change_action(player.action, player.frame, RUN)
-		else:
-			player.action, player.frame = change_action(player.action, player.frame, JUMP)
-	else:
-		player.action, player.frame = change_action(player.action, player.frame, IDLE)
-
-	player.frame = (player.frame + 1) if player.frame < (len(animation_db[player.action]) - 1) else 0
-	player_img_id = animation_db[player.action][player.frame]
-	player_img = animation_frames[player_img_id]
+	player.try_move(tile_rects)
 
 	dead_enemies, killed_player = enemies_update(enemies, tile_rects, player.rect, display, scroll)
 
@@ -83,15 +53,16 @@ while True:
 		player, enemies, items = reset_game()
 		continue
 
+	if dead_enemies:
+		player.y_momentum = -player.jump_force
+		player.on_ground = False
+
 	foreach(lambda killed: enemies.remove(killed), dead_enemies)
 
 	obtains = items_update(items, player.rect, display, scroll)
 	foreach(lambda obtained: items.remove(obtained), obtains)
 
-	player_pos = (player.rect.x - scroll[0] - PLAYER_SPRITE_OFFSET[0], player.rect.y - scroll[1] - PLAYER_SPRITE_OFFSET[1])
-	display.blit(pygame.transform.flip(player_img, player.flip, False), player_pos)
-	# debug_rect = pygame.Rect(player.rect.x - scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height)
-	# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
+	bind_render_input(player.render)
 
 	for event in pygame.event.get():
 		if event.type == QUIT:
@@ -104,9 +75,7 @@ while True:
 			if event.key == K_a:
 				player.moving_left = True
 			if event.key == K_SPACE:
-				if player.air_timer < EDGE_JUMP_TIME_LIMIT:
-					player.y_momentum = -player.jump_force
-					player.on_ground = False
+				player.try_jump()
 
 		if event.type == KEYUP:
 			if event.key == K_d:
