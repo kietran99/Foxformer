@@ -49,6 +49,29 @@ def render_map(display, scroll):
 
 	return tile_rects
 
+def gen_tiles_txt(map, out_path):
+	tiles = ""
+	y = 0
+	for row in map:
+		x = 0
+		for tile in row:
+			pos = (x * TILE_SIZE, y * TILE_SIZE)
+			
+			if tile in tile_dict:
+				tiles += 'X'
+
+			elif tile == NONE:
+				tiles += '0'
+
+			x += 1
+
+		tiles += '\n'
+		y += 1
+
+	f = open(out_path, 'w')
+	f.write(tiles)
+	f.close()
+
 dirt_codes = ['1', '3', '4']
 
 tile_dict = {

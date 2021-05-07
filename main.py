@@ -4,12 +4,12 @@ from global_path import *
 from config import *
 from utils import foreach
 
+from game_manager import GameManager
 from animation import *
 from map import *
 from player import *
 from entity import *
-from enemy import *
-from item import *
+from UI import *
 
 
 
@@ -24,17 +24,21 @@ pygame.display.set_caption('Foxformer')
 window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION))
 
+# gen_tiles_txt(game_map, 'maps/tiles.txt')
 entities_map = load_map('maps/entities')
 
 def reset_game():
+	game_manager = GameManager()
 	player = Player()
 	enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
-	return player, enemies, items
+	UI = UICanvas()
+	return game_manager, player, enemies, items, UI
 
-player, enemies, items = reset_game()
+game_manager, player, enemies, items, UI = reset_game()
 
 pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.5)
 
 while True:
 	display.fill((146, 244, 255))
@@ -50,12 +54,8 @@ while True:
 	dead_enemies, killed_player = enemies_update(enemies, tile_rects, player.rect, display, scroll)
 
 	if killed_player:
-		player, enemies, items = reset_game()
+		game_manager, player, enemies, items, UI = reset_game()
 		continue
-
-	if dead_enemies:
-		player.y_momentum = -player.jump_force
-		player.on_ground = False
 
 	foreach(lambda killed: enemies.remove(killed), dead_enemies)
 
@@ -69,22 +69,13 @@ while True:
 			pygame.quit()
 			sys.exit()
 
-		if event.type == KEYDOWN:
-			if event.key == K_d:
-				player.moving_right = True
-			if event.key == K_a:
-				player.moving_left = True
-			if event.key == K_SPACE:
-				player.try_jump()
-
-		if event.type == KEYUP:
-			if event.key == K_d:
-				player.moving_right = False
-			if event.key == K_a:
-				player.moving_left = False
+		player.handle_input(event)
 
 	surface = pygame.transform.scale(display, WINDOW_SIZE)
 	window.blit(surface, (0, 0))
+
+	UI.render(window)
+	
 	pygame.display.update()
 	clock.tick(60)
 

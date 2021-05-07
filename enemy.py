@@ -2,6 +2,7 @@ import pygame
 
 from global_path import *
 from animation import *
+from event_channel import trigger
 
 from map import *
 
@@ -11,6 +12,7 @@ from map import *
 OPOSSUM_WIDTH = 35
 OPOSSUM_HEIGHT = 24
 OPOSSUM_SPRITE_OFFSET = (0, 2)
+OPOSSUM_Y = 7
 
 PLAYER_DMG_TOP_OFFSET = 27
 
@@ -23,6 +25,7 @@ GET_KILLED = 2
 def enemies_update(enemies, tile_rects, player_rect, display, scroll):
 	killed_player = False
 	dead_enemies = []
+
 	for enemy in enemies:
 		enemy.move(tile_rects)
 		collision_res = enemy.test_player_collision(player_rect)
@@ -70,6 +73,10 @@ class Opossum:
 		cropped_rect = self.rect.clip(player_rect)
 		# print("W: " + str(cropped_rect.width) + " H: " + str(cropped_rect.height))
 		killed_player = cropped_rect.width < cropped_rect.height
+
+		if not killed_player:
+			trigger("Enemy Killed", 0)
+			
 		return KILLED_PLAYER if killed_player else GET_KILLED
 
 	def render(self, display, scroll):
@@ -80,10 +87,6 @@ class Opossum:
 		img_id = opossum_anim_db[self.action][self.frame]
 		sprite = animation_frames[img_id]
 		display.blit(pygame.transform.flip(sprite, self.flip, False), (self.rect.x - scroll[0] - OPOSSUM_SPRITE_OFFSET[0], self.rect.y - scroll[1] - OPOSSUM_SPRITE_OFFSET[1]))
-
-enemies_dict = {
-	'5': lambda pos: Opossum((pos[0] - 0, pos[1] - 7))
-}
 
 opossum_anim_db = {}
 opossum_anim_db['RUN'] = load_anim(sprites_root + 'opossum', [5, 5, 5, 5, 5, 5])

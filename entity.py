@@ -2,14 +2,22 @@ import pygame
 
 from global_path import *
 
-from map import *
-from enemy import enemies_dict
-from item import items_dict
+from map import TILE_SIZE
+from enemy import *
+from item import *
 
 
 
 
 
+
+enemies_dict = {
+	'2': lambda pos: Opossum((pos[0] - 0, pos[1] - OPOSSUM_Y))
+}
+
+items_dict = {
+	'5': lambda pos: Cherry((pos[0], pos[1] - CHERRY_Y))
+}
 
 def gen_entities(entities_map, display, scroll):
 	enemies = []

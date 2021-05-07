@@ -1,7 +1,9 @@
 import pygame
+from pygame.locals import *
 
 from config import *
 from global_path import *
+from event_channel import add_listener
 
 from map import *
 from animation import *
@@ -40,6 +42,23 @@ class Player:
 		self.flip = False
 
 		self.sprite = None
+
+		add_listener("Enemy Killed", lambda _: self.jump())
+
+	def handle_input(self, event):
+		if event.type == KEYDOWN:
+			if event.key == K_d:
+				self.moving_right = True
+			if event.key == K_a:
+				self.moving_left = True
+			if event.key == K_SPACE:
+				self.try_jump()
+
+		if event.type == KEYUP:
+			if event.key == K_d:
+				self.moving_right = False
+			if event.key == K_a:
+				self.moving_left = False
 
 	def try_move(self, tile_rects):
 		player_movement = [0, 0]
@@ -101,8 +120,11 @@ class Player:
 
 	def try_jump(self):
 		if self.air_timer < EDGE_JUMP_TIME_LIMIT:
-			self.y_momentum = -self.jump_force
-			self.on_ground = False
+			self.jump()
+
+	def jump(self):
+		self.y_momentum = -self.jump_force
+		self.on_ground = False
 
 	def render(self, display, scroll):
 		# debug_rect = pygame.Rect(player.rect.x - scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height)

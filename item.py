@@ -1,6 +1,7 @@
 import pygame
 
 from global_path import *
+from event_channel import trigger
 
 from animation import *
 
@@ -31,7 +32,12 @@ class Cherry:
 		self.frame = 0
 
 	def test_player_collision(self, player_rect):
-		return self.rect.colliderect(player_rect)
+		res = self.rect.colliderect(player_rect)
+
+		if res:
+			trigger("Cherry Obtained", 0)
+
+		return res
 
 	def render(self, display, scroll):
 		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
@@ -40,10 +46,6 @@ class Cherry:
 		img_id = cherry_anim_db[self.action][self.frame]
 		sprite = animation_frames[img_id]
 		display.blit(sprite, (self.rect.x - scroll[0] - CHERRY_SPRITE_OFFSET[0], self.rect.y - scroll[1] - CHERRY_SPRITE_OFFSET[1]))
-
-items_dict = {
-	'7': lambda pos: Cherry((pos[0], pos[1] - CHERRY_Y))
-}
 
 cherry_anim_db = {}
 cherry_anim_db['IDLE'] = load_anim(sprites_root + 'cherry', [7, 7, 7, 7, 7, 7, 7])
