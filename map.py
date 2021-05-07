@@ -28,7 +28,7 @@ def collision_test(rect, tiles):
 def render_bg(display, scroll):
 	foreach(lambda i: display.blit(bg_img, ((i - 1) * bg_img.get_width() - scroll[0] * BG_MOVE_MODIFIER, 0)), range(BG_LEN + 1))
 
-def render_map(display, scroll):
+def render_map(game_map, display, scroll):
 	tile_rects = []
 	y = 0
 	for row in game_map:
@@ -49,8 +49,12 @@ def render_map(display, scroll):
 
 	return tile_rects
 
+def merge_maps(map_0, map_1):
+	return [a + b for a, b in zip(map_0, map_1)]
+
 def gen_tiles_txt(map, out_path):
 	tiles = ""
+
 	y = 0
 	for row in map:
 		x = 0
@@ -61,13 +65,13 @@ def gen_tiles_txt(map, out_path):
 				tiles += 'X'
 
 			elif tile == NONE:
-				tiles += '0'
+				tiles += '-'
 
 			x += 1
 
 		tiles += '\n'
 		y += 1
-
+	tiles = tiles[:-1]
 	f = open(out_path, 'w')
 	f.write(tiles)
 	f.close()
@@ -81,5 +85,5 @@ tile_dict = {
 	'2': pygame.image.load(env_root + 'grass_0.png')
 }
 
-game_map = load_map('maps/map')
+# game_map = load_map('maps/map')
 bg_img = pygame.image.load(env_root + 'back.png')

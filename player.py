@@ -122,8 +122,8 @@ class Player:
 		if self.air_timer < EDGE_JUMP_TIME_LIMIT:
 			self.jump()
 
-	def jump(self):
-		self.y_momentum = -self.jump_force
+	def jump(self, jump_force=None):
+		self.y_momentum = -jump_force if jump_force != None else -self.jump_force
 		self.on_ground = False
 
 	def render(self, display, scroll):

@@ -45,9 +45,13 @@ class UICanvas:
 		self.n_gems_text = Text('0', 48, (255, 255, 255), (140, 130))
 
 		add_listener("Num Cherries Changed", self.on_n_cherries_changed)
+		add_listener("Num Gems Changed", self.on_n_gems_changed)
 
 	def on_n_cherries_changed(self, n_cherries):
 		self.n_cherries_text.text = str(n_cherries)
+
+	def on_n_gems_changed(self, n_gems):
+		self.n_gems_text.text = str(n_gems)
 
 	def render(self, window):
 		display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION), SRCALPHA)

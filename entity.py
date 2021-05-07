@@ -12,12 +12,20 @@ from item import *
 
 
 enemies_dict = {
-	'2': lambda pos: Opossum((pos[0] - 0, pos[1] - OPOSSUM_Y))
+	'1': lambda pos: Opossum((pos[0] - 0, pos[1] - OPOSSUM_Y))
 }
 
 items_dict = {
-	'5': lambda pos: Cherry((pos[0], pos[1] - CHERRY_Y))
+	'4': lambda pos: Cherry((pos[0], pos[1] - CHERRY_Y), CHERRY_SIZE, CHERRY_SPRITE_OFFSET),
+	'9': lambda pos: Gem((pos[0], pos[1] - GEM_Y), CHERRY_SIZE, CHERRY_SPRITE_OFFSET)
 }
+
+def load_entity_map(path):
+	f = open(path + '.txt', 'r')
+	data = f.read()
+	f.close()
+	data = data.split('\n')
+	return [list(row) for row in data]
 
 def gen_entities(entities_map, display, scroll):
 	enemies = []
@@ -41,3 +49,27 @@ def gen_entities(entities_map, display, scroll):
 		y += 1
 
 	return enemies, items
+
+def layer_tiles(entity_map, map, out_path):
+	entities = ""
+
+	y = 0
+	for row in map:
+		x = 0
+		for tile in row:
+			pos = (x * TILE_SIZE, y * TILE_SIZE)
+
+			if tile in tile_dict:
+				entities += 'X'
+
+			elif tile == NONE:
+				entities += '-' if entity_map[y][x] == '-' else entity_map[y][x]
+
+			x += 1
+
+		entities += '\n'
+		y += 1
+
+	f = open(out_path, 'w')
+	f.write(entities)
+	f.close()

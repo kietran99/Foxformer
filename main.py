@@ -1,4 +1,5 @@
 import pygame, sys
+from functools import reduce
 
 from global_path import *
 from config import *
@@ -24,8 +25,19 @@ pygame.display.set_caption('Foxformer')
 window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION))
 
-# gen_tiles_txt(game_map, 'maps/tiles.txt')
-entities_map = load_map('maps/entities')
+map_pieces = [
+	load_map('maps/map_0'), 
+	load_map('maps/map_1')
+]
+
+game_map = reduce(merge_maps, map_pieces)
+
+entity_pieces = [
+	load_entity_map('maps/entities_0'),
+	load_entity_map('maps/entities_1')
+]
+
+entities_map = reduce(merge_maps, entity_pieces)
 
 def reset_game():
 	game_manager = GameManager()
@@ -38,16 +50,19 @@ game_manager, player, enemies, items, UI = reset_game()
 
 pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.set_volume(0.0)
 
 while True:
 	display.fill((146, 244, 255))
+
+	if player.rect.y > WINDOW_SIZE[1]:
+		game_manager, player, enemies, items, UI = reset_game()
 
 	player.true_scroll, scroll = calc_scroll(display, player, player.true_scroll)
 
 	bind_render_input = lambda render_fn: render_fn(display, scroll)
 	bind_render_input(render_bg)
-	tile_rects = bind_render_input(render_map)
+	tile_rects = render_map(game_map, display, scroll)
 
 	player.try_move(tile_rects)
 
