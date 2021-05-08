@@ -72,8 +72,13 @@ class UICanvas:
 		self.gem_icon_pos = (7, 26)
 		self.n_gems_text = Text('0', 48, (255, 255, 255), (140, 130), True)
 
+		self.should_show_weed = False
+		self.weed_icon = pygame.image.load(sprites_root + 'weed/weed_0.png')
+		self.weed_icon_pos = (280, 6)
+
 		add_listener("Num Cherries Changed", self.on_n_cherries_changed)
 		add_listener("Num Gems Changed", self.on_n_gems_changed)
+		add_listener("On Weed Obtained", self.on_weed_obtained)
 
 	def on_n_cherries_changed(self, n_cherries):
 		self.n_cherries_text.text = str(n_cherries)
@@ -81,11 +86,16 @@ class UICanvas:
 	def on_n_gems_changed(self, n_gems):
 		self.n_gems_text.text = str(n_gems)
 
+	def on_weed_obtained(self, _):
+		self.should_show_weed = True
+
 	def render(self, window):
 		display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION), SRCALPHA)
 
 		display.blit(self.cherry_icon, self.cherry_icon_pos)
 		display.blit(self.gem_icon, self.gem_icon_pos)
+		if self.should_show_weed:
+			display.blit(self.weed_icon, self.weed_icon_pos)
 
 		surface = pygame.transform.scale(display, WINDOW_SIZE)
 		window.blit(surface, (0, 0))
