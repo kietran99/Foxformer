@@ -29,7 +29,8 @@ def enemies_update(enemies, tile_rects, player_rect, display, scroll):
 	for enemy in enemies:
 		enemy.move(tile_rects)
 		collision_res = enemy.test_player_collision(player_rect)
-		if collision_res == KILLED_PLAYER:		
+		if collision_res == KILLED_PLAYER:
+			# trigger("Game Over", 0)	
 			killed_player = True
 			break
 

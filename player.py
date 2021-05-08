@@ -44,6 +44,9 @@ class Player:
 		self.sprite = None
 
 		add_listener("Enemy Killed", lambda _: self.jump())
+		add_listener("On Spring Collide", lambda _: self.jump(7))
+		add_listener("On Crate Broken", lambda _: self.jump())
+		add_listener("On Weed Obtained", lambda _: self.change_jump_force(5))
 
 	def handle_input(self, event):
 		if event.type == KEYDOWN:
@@ -126,8 +129,11 @@ class Player:
 		self.y_momentum = -jump_force if jump_force != None else -self.jump_force
 		self.on_ground = False
 
+	def change_jump_force(self, new_force):
+		self.jump_force = new_force
+
 	def render(self, display, scroll):
-		# debug_rect = pygame.Rect(player.rect.x - scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height)
+		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
 		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
 		player_pos = (self.rect.x - scroll[0] - PLAYER_SPRITE_OFFSET[0], self.rect.y - scroll[1] - PLAYER_SPRITE_OFFSET[1])
 		display.blit(pygame.transform.flip(self.sprite, self.flip, False), player_pos)
@@ -147,6 +153,6 @@ JUMP = 'jump'
 
 animation_db = {}
 animation_db[IDLE] = load_anim(sprites_root + 'player/idle', [7, 7, 7, 7])
-animation_db[RUN] = load_anim(sprites_root + 'player/run', [7, 7, 7, 7, 7, 7])
+animation_db[RUN] = load_anim(sprites_root + 'player/run', [5, 5, 5, 5, 5, 5])
 animation_db[JUMP] = load_anim(sprites_root + 'player/jump', [7, 7])
 

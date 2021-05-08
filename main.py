@@ -52,10 +52,21 @@ pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.0)
 
+# game_over = False;
+
+# def on_game_over(_):
+# 	global game_over
+# 	game_over = True
+
+# add_listener("Game Over", on_game_over)
+
 while True:
 	display.fill((146, 244, 255))
 
-	if player.rect.y > WINDOW_SIZE[1]:
+	# if game_over:
+	# 	game_manager, player, enemies, items, UI = reset_game()
+
+	if player.rect.y > WINDOW_SIZE[1] / 1.5:
 		game_manager, player, enemies, items, UI = reset_game()
 
 	player.true_scroll, scroll = calc_scroll(display, player, player.true_scroll)
