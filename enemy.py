@@ -44,8 +44,6 @@ def enemies_update(enemies, tile_rects, player_rect, display, scroll):
 class Opossum:
 	def __init__(self, pos):
 		self.move_speed = 2
-		# self.move_range = move_range
-		# self.pivot_x = pos[0]
 		self.move_dir_mult = 1
 		self.rect = pygame.Rect(pos[0], pos[1], OPOSSUM_WIDTH, OPOSSUM_HEIGHT)
 		self.flip = False
@@ -65,8 +63,6 @@ class Opossum:
 		if not hit_list:
 			self.move_dir_mult *= -1
 
-		# if abs(self.rect.x - self.pivot_x) > self.move_range:
-
 	def test_player_collision(self, player_rect):
 		if not self.rect.colliderect(player_rect):
 			return NOT_COLLIDE
@@ -76,7 +72,7 @@ class Opossum:
 		killed_player = cropped_rect.width < cropped_rect.height
 
 		if not killed_player:
-			trigger("Enemy Killed", 0)
+			trigger("Enemy Killed", (self.rect.x, self.rect.y))
 			
 		return KILLED_PLAYER if killed_player else GET_KILLED
 

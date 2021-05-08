@@ -67,7 +67,7 @@ class Player:
 		player_movement = [0, 0]
 		player_movement[0] += self.move_speed if self.moving_right else 0
 		player_movement[0] -= self.move_speed if self.moving_left else 0
-		player_movement[1] += self.y_momentum 
+		player_movement[1] += self.y_momentum
 		self.y_momentum = self.y_momentum + GRAVITY_MOD if self.y_momentum <= MAX_Y_MOMENTUM else MAX_Y_MOMENTUM
 
 		collisions = self.move(player_movement, tile_rects)
@@ -82,14 +82,15 @@ class Player:
 		else:
 			self.air_timer += 1
 
-		if player_movement[0] != 0:
+		if not self.on_ground:
 			self.flip = player_movement[0] < 0
-			if self.on_ground:
+			self.action, self.frame = change_action(self.action, self.frame, JUMP)
+		else:
+			if player_movement[0] != 0:
+				self.flip = player_movement[0] < 0
 				self.action, self.frame = change_action(self.action, self.frame, RUN)
 			else:
-				self.action, self.frame = change_action(self.action, self.frame, JUMP)
-		else:
-			self.action, self.frame = change_action(self.action, self.frame, IDLE)
+				self.action, self.frame = change_action(self.action, self.frame, IDLE)
 
 		self.frame = (self.frame + 1) if self.frame < (len(animation_db[self.action]) - 1) else 0
 		player_img_id = animation_db[self.action][self.frame]
@@ -154,5 +155,5 @@ JUMP = 'jump'
 animation_db = {}
 animation_db[IDLE] = load_anim(sprites_root + 'player/idle', [7, 7, 7, 7])
 animation_db[RUN] = load_anim(sprites_root + 'player/run', [5, 5, 5, 5, 5, 5])
-animation_db[JUMP] = load_anim(sprites_root + 'player/jump', [7, 7])
+animation_db[JUMP] = load_anim(sprites_root + 'player/jump', [7])
 

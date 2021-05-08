@@ -66,6 +66,7 @@ class Gem(Item):
 
 	def on_player_collide(self, player_rect):
 		trigger("Gem Obtained", 0)
+		trigger("Rare Item Obtained", (self.rect.x, self.rect.y))
 
 
 
@@ -125,3 +126,4 @@ class Weed(Quirk):
 
 	def on_player_collide(self, player_rect):
 		trigger("On Weed Obtained", 0)
+		trigger("Rare Item Obtained", (self.rect.x, self.rect.y))

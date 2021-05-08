@@ -11,6 +11,7 @@ from map import *
 from player import *
 from entity import *
 from UI import *
+from vfx import VFXManager
 
 
 
@@ -47,6 +48,8 @@ def reset_game():
 	return game_manager, player, enemies, items, UI
 
 game_manager, player, enemies, items, UI = reset_game()
+
+vfxManager = VFXManager()
 
 pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
@@ -89,6 +92,8 @@ while True:
 	foreach(lambda obtained: items.remove(obtained), obtains)
 
 	bind_render_input(player.render)
+
+	bind_render_input(vfxManager.render)
 
 	for event in pygame.event.get():
 		if event.type == QUIT:
