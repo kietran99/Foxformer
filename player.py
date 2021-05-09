@@ -13,9 +13,9 @@ from animation import *
 
 
 
-PLAYER_WIDTH = 21
+PLAYER_WIDTH = 16
 PLAYER_HEIGHT = 22
-PLAYER_SPRITE_OFFSET = (4, 10)
+PLAYER_SPRITE_OFFSET = (8, 10)
 EDGE_JUMP_TIME_LIMIT = 15
 GRAVITY_MOD = 0.2
 MAX_Y_MOMENTUM = 3
@@ -31,7 +31,7 @@ class Player:
 		self.y_momentum = 0
 		self.air_timer = 0
 
-		self.rect = pygame.Rect(100, 100, PLAYER_WIDTH, PLAYER_HEIGHT)
+		self.rect = pygame.Rect(100, 144, PLAYER_WIDTH, PLAYER_HEIGHT)
 
 		self.on_ground = True
 
@@ -43,10 +43,13 @@ class Player:
 
 		self.sprite = None
 
+		self.double_jump_enabled = False
+		self.is_second_jump = False
+
 		add_listener("Enemy Killed", lambda _: self.jump(4))
 		add_listener("On Spring Collide", lambda _: self.jump(7))
 		add_listener("On Crate Broken", lambda _: self.jump(4))
-		add_listener("On Weed Obtained", lambda _: self.change_jump_force(5))
+		add_listener("On Weed Obtained", lambda _: self.enable_double_jump())
 
 	def handle_input(self, event):
 		if event.type == KEYDOWN:
@@ -76,6 +79,7 @@ class Player:
 			self.y_momentum = 0
 			self.air_timer = 0
 			self.on_ground = True
+			self.is_second_jump = False
 		elif collisions['top']:
 			self.y_momentum = 0
 			self.air_timer = 0
@@ -123,6 +127,15 @@ class Player:
 		return collision_types
 
 	def try_jump(self):
+		if not self.on_ground:
+			if not self.double_jump_enabled:
+				return
+
+			if self.is_second_jump:
+				return
+
+			self.jump(self.jump_force)
+
 		if self.air_timer < EDGE_JUMP_TIME_LIMIT:
 			self.jump()
 
@@ -130,23 +143,14 @@ class Player:
 		self.y_momentum = -jump_force if jump_force != None else -self.jump_force
 		self.on_ground = False
 
-	def change_jump_force(self, new_force):
-		self.jump_force = new_force
+	def enable_double_jump(self):
+		self.double_jump_enabled = True
 
 	def render(self, display, scroll):
 		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
 		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
 		player_pos = (self.rect.x - scroll[0] - PLAYER_SPRITE_OFFSET[0], self.rect.y - scroll[1] - PLAYER_SPRITE_OFFSET[1])
 		display.blit(pygame.transform.flip(self.sprite, self.flip, False), player_pos)
-
-def calc_scroll(display, player, true_scroll):
-	player.true_scroll[0] += (player.rect.x - player.true_scroll[0] - display.get_width() / 2 + player.rect.width / 2) / camera_smooth_factor
-	player.true_scroll[1] += (player.rect.y - player.true_scroll[1] - display.get_height() / 2 + player.rect.height / 2) / camera_smooth_factor
-	scroll = player.true_scroll.copy()
-	scroll[0] = int(scroll[0])
-	scroll[1] = int(scroll[1])
-
-	return true_scroll, scroll
 
 IDLE = 'idle'
 RUN = 'run'

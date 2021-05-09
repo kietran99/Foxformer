@@ -29,16 +29,18 @@ display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTI
 
 map_pieces = [
 	# load_map('maps/map_0'), 
-	load_map('maps/map_1'),
-	load_map('maps/map_2')
+	# load_map('maps/map_1'),
+	# load_map('maps/map_2'),
+	load_map('maps/map_3')
 ]
 
 game_map = reduce(merge_maps, map_pieces)
 
 entity_pieces = [
 	# load_entity_map('maps/entities_0'),
-	load_entity_map('maps/entities_1'),
-	load_entity_map('maps/entities_2')
+	# load_entity_map('maps/entities_1'),
+	# load_entity_map('maps/entities_2'),
+	load_entity_map('maps/entities_3')
 ]
 
 entities_map = reduce(merge_maps, entity_pieces)
@@ -47,13 +49,14 @@ def reset_game():
 	remove_all_listeners()
 	game_manager = GameManager()
 	player = Player()
-	enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
+	enemies, items = gen_entities(entities_map, display, calc_scroll(display, player)[1])
 	UI = UICanvas()
-	return game_manager, player, enemies, items, UI
+	vfxManager = VFXManager()
+	return game_manager, player, enemies, items, UI, vfxManager
 
-game_manager, player, enemies, items, UI = reset_game()
+game_manager, player, enemies, items, UI, vfxManager = reset_game()
 
-vfxManager = VFXManager()
+
 
 pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
@@ -64,10 +67,10 @@ pygame.mixer.music.set_volume(0.0)
 while True:
 	display.fill((146, 244, 255))
 
-	if player.rect.y > WINDOW_SIZE[1] / 1.5:
-		game_manager, player, enemies, items, UI = reset_game()
+	if player.rect.y > MAP_BOTTOM:
+		game_manager, player, enemies, items, UI, vfxManager = reset_game()
 
-	player.true_scroll, scroll = calc_scroll(display, player, player.true_scroll)
+	player.true_scroll, scroll = calc_scroll(display, player)
 
 	bind_render_input = lambda render_fn: render_fn(display, scroll)
 	bind_render_input(render_bg)
@@ -78,7 +81,7 @@ while True:
 	dead_enemies, killed_player = enemies_update(enemies, tile_rects, player.rect, display, scroll)
 
 	if killed_player:
-		game_manager, player, enemies, items, UI = reset_game()
+		game_manager, player, enemies, items, UI, vfxManager = reset_game()
 		continue
 
 	foreach(lambda killed: enemies.remove(killed), dead_enemies)

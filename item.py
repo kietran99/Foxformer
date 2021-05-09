@@ -11,15 +11,23 @@ from animation import *
 
 def items_update(items, player_rect, display, scroll):
 	obtains = []
+	invis_tiles = []
 
 	for item in items:
+		if isinstance(item, InvisTile):
+			invis_tiles.append(item)
+
 		collide, obtainable = item.test_player_collision(player_rect)
 
 		if collide and obtainable:
 			obtains.append(item)
 			continue
 
-		item.render(display, scroll)
+		if not isinstance(item, InvisTile):
+			item.render(display, scroll)
+
+	for tile in invis_tiles:
+		tile.render(display, scroll)
 
 	return obtains
 
@@ -82,9 +90,47 @@ class Spring(Prop):
 	def __init__(self, pos, size, sprite_offset):
 		super().__init__(pos, size, sprite_offset)
 		self.anim_db['IDLE'] = load_anim(sprites_root + 'spring', [1])
+		self.anim_db['ACTIVE'] = load_anim(sprites_root + 'spring', [1, 7])
 
 	def on_player_collide(self, player_rect):
+		self.action = 'ACTIVE'
 		trigger("On Spring Collide", 0)
+
+	def render(self, display, scroll):
+		if self.action == 'ACTIVE':
+			if self.frame == len(self.anim_db[self.action]) - 1:
+				self.action = 'IDLE'
+				self.frame = 0
+		
+		self.frame = (self.frame + 1) if self.frame < (len(self.anim_db[self.action]) - 1) else 0
+		img_id = self.anim_db[self.action][self.frame]
+		sprite = animation_frames[img_id]
+		display.blit(sprite, (self.rect.x - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))	
+
+class InvisTile(Prop):
+	def __init__(self, pos, size, sprite_offset):
+		super().__init__(pos, size, sprite_offset)
+		self.should_invis = False
+		self.sprite = pygame.image.load(sprites_root + 'invis-tile/invis-tile_0.png')
+
+	def test_player_collision(self, player_rect):
+		res = self.rect.colliderect(player_rect)
+		self.should_invis = res
+
+		if res:
+			self.on_player_collide(player_rect)
+
+		return res, self.obtainable
+
+	def render(self, display, scroll):
+		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
+		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
+		if self.should_invis:
+			return
+
+		display.blit(self.sprite, (self.rect.x - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
+		display.blit(self.sprite, (self.rect.x + 16 - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
+		display.blit(self.sprite, (self.rect.x + 32 - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
 
 
 

@@ -14,6 +14,7 @@ DIRT_VAR = '1'
 NONE = '0'
 BG_LEN = 4
 BG_MOVE_MODIFIER = 0.25
+CAMERA_SMOOTH_FACTOR = 10
 
 def load_map(path):
 	f = open(path + '.txt', 'r')
@@ -52,29 +53,15 @@ def render_map(game_map, display, scroll):
 def merge_maps(map_0, map_1):
 	return [a + b for a, b in zip(map_0, map_1)]
 
-def gen_tiles_txt(map, out_path):
-	tiles = ""
+def calc_scroll(display, player):
+	player.true_scroll[0] += (player.rect.x - player.true_scroll[0] - display.get_width() / 2 + player.rect.width / 2) / CAMERA_SMOOTH_FACTOR
+	player.true_scroll[1] += (player.rect.y - player.true_scroll[1] - display.get_height() / 2 + player.rect.height / 2) / CAMERA_SMOOTH_FACTOR
+	player.true_scroll[1] = player.true_scroll[1] if player.true_scroll[1] <= 112 else 112
+	scroll = player.true_scroll.copy()
+	scroll[0] = int(scroll[0])
+	scroll[1] = int(scroll[1])
 
-	y = 0
-	for row in map:
-		x = 0
-		for tile in row:
-			pos = (x * TILE_SIZE, y * TILE_SIZE)
-			
-			if tile in tile_dict:
-				tiles += 'X'
-
-			elif tile == NONE:
-				tiles += '-'
-
-			x += 1
-
-		tiles += '\n'
-		y += 1
-	tiles = tiles[:-1]
-	f = open(out_path, 'w')
-	f.write(tiles)
-	f.close()
+	return player.true_scroll, scroll
 
 dirt_codes = ['1', '3', '4']
 
