@@ -23,7 +23,7 @@ MAX_Y_MOMENTUM = 3
 class Player:
 	def __init__(self):
 		self.move_speed = 3
-		self.jump_force = 3.5
+		self.jump_force = 4
 
 		self.moving_right = False
 		self.moving_left = False
@@ -43,9 +43,9 @@ class Player:
 
 		self.sprite = None
 
-		add_listener("Enemy Killed", lambda _: self.jump())
+		add_listener("Enemy Killed", lambda _: self.jump(4))
 		add_listener("On Spring Collide", lambda _: self.jump(7))
-		add_listener("On Crate Broken", lambda _: self.jump())
+		add_listener("On Crate Broken", lambda _: self.jump(4))
 		add_listener("On Weed Obtained", lambda _: self.change_jump_force(5))
 
 	def handle_input(self, event):

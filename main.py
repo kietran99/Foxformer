@@ -4,6 +4,7 @@ from functools import reduce
 from global_path import *
 from config import *
 from utils import foreach
+from event_channel import remove_all_listeners
 
 from game_manager import GameManager
 from animation import *
@@ -27,20 +28,23 @@ window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION))
 
 map_pieces = [
-	load_map('maps/map_0'), 
-	load_map('maps/map_1')
+	# load_map('maps/map_0'), 
+	load_map('maps/map_1'),
+	load_map('maps/map_2')
 ]
 
 game_map = reduce(merge_maps, map_pieces)
 
 entity_pieces = [
-	load_entity_map('maps/entities_0'),
-	load_entity_map('maps/entities_1')
+	# load_entity_map('maps/entities_0'),
+	load_entity_map('maps/entities_1'),
+	load_entity_map('maps/entities_2')
 ]
 
 entities_map = reduce(merge_maps, entity_pieces)
 
 def reset_game():
+	remove_all_listeners()
 	game_manager = GameManager()
 	player = Player()
 	enemies, items = gen_entities(entities_map, display, calc_scroll(display, player, player.true_scroll)[1])
@@ -55,19 +59,10 @@ pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.0)
 
-# game_over = False;
 
-# def on_game_over(_):
-# 	global game_over
-# 	game_over = True
-
-# add_listener("Game Over", on_game_over)
 
 while True:
 	display.fill((146, 244, 255))
-
-	# if game_over:
-	# 	game_manager, player, enemies, items, UI = reset_game()
 
 	if player.rect.y > WINDOW_SIZE[1] / 1.5:
 		game_manager, player, enemies, items, UI = reset_game()

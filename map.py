@@ -85,5 +85,4 @@ tile_dict = {
 	'2': pygame.image.load(env_root + 'grass_0.png')
 }
 
-# game_map = load_map('maps/map')
 bg_img = pygame.image.load(env_root + 'back.png')

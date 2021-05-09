@@ -51,27 +51,3 @@ def gen_entities(entities_map, display, scroll):
 		y += 1
 
 	return enemies, items
-
-def layer_tiles(entity_map, map, out_path):
-	entities = ""
-
-	y = 0
-	for row in map:
-		x = 0
-		for tile in row:
-			pos = (x * TILE_SIZE, y * TILE_SIZE)
-
-			if tile in tile_dict:
-				entities += 'X'
-
-			elif tile == NONE:
-				entities += '-' if entity_map[y][x] == '-' else entity_map[y][x]
-
-			x += 1
-
-		entities += '\n'
-		y += 1
-
-	f = open(out_path, 'w')
-	f.write(entities)
-	f.close()

@@ -25,6 +25,9 @@ def remove_listener(name, listener):
 	if name in event_dict:
 		event_dict[name].remove_listener(listener)
 
+def remove_all_listeners():
+	event_dict.clear()
+
 def trigger(name, event_data):
 	if name not in event_dict:
 		event_dict[name] = Event()

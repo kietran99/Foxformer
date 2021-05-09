@@ -58,9 +58,13 @@ class Opossum:
 
 		ground_check_rect = self.rect.copy()
 		ground_check_rect.x += OPOSSUM_WIDTH
-		ground_check_rect.y += OPOSSUM_HEIGHT
-		hit_list = collision_test(ground_check_rect, tiles)
-		if not hit_list:
+		ground_check_rect.y += 10
+		if not collision_test(ground_check_rect, tiles):
+			self.move_dir_mult *= -1
+			return
+
+		ground_check_rect.x -= 2 * OPOSSUM_WIDTH
+		if not collision_test(ground_check_rect, tiles):
 			self.move_dir_mult *= -1
 
 	def test_player_collision(self, player_rect):
