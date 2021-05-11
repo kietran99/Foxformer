@@ -28,18 +28,18 @@ window = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION))
 
 map_pieces = [
-	# load_map('maps/map_0'), 
-	# load_map('maps/map_1'),
-	# load_map('maps/map_2'),
+	load_map('maps/map_0'), 
+	load_map('maps/map_1'),
+	load_map('maps/map_2'),
 	load_map('maps/map_3')
 ]
 
 game_map = reduce(merge_maps, map_pieces)
 
 entity_pieces = [
-	# load_entity_map('maps/entities_0'),
-	# load_entity_map('maps/entities_1'),
-	# load_entity_map('maps/entities_2'),
+	load_entity_map('maps/entities_0'),
+	load_entity_map('maps/entities_1'),
+	load_entity_map('maps/entities_2'),
 	load_entity_map('maps/entities_3')
 ]
 

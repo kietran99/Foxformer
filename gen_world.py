@@ -89,7 +89,7 @@ def append_top_map(fill_char, path_format, n_maps, n_rows):
 		f.close()
 
 # gen_tiles_txt(load_map('maps/map_3'), 'maps/entities_3')
-layer_tiles(load_map('maps/map_3'), 'maps/entities_3')
+# layer_tiles(load_map('maps/map_0'), 'maps/entities_0')
 # gen_empty_map('maps/map_3')
 # append_top_map('0', 'maps/map', 4, 1)
 # append_top_map('-', 'maps/entities', 4, 1)

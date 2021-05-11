@@ -31,7 +31,7 @@ class Player:
 		self.y_momentum = 0
 		self.air_timer = 0
 
-		self.rect = pygame.Rect(100, 144, PLAYER_WIDTH, PLAYER_HEIGHT)
+		self.rect = pygame.Rect(144, 144, PLAYER_WIDTH, PLAYER_HEIGHT)
 
 		self.on_ground = True
 
@@ -134,6 +134,7 @@ class Player:
 			if self.is_second_jump:
 				return
 
+			self.is_second_jump = True
 			self.jump(self.jump_force)
 
 		if self.air_timer < EDGE_JUMP_TIME_LIMIT:

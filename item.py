@@ -1,5 +1,6 @@
 import pygame
 
+from utils import foreach
 from global_path import *
 from event_channel import trigger
 
@@ -10,24 +11,35 @@ from animation import *
 
 
 def items_update(items, player_rect, display, scroll):
+	item_sprites = []
+	invis_tile_sprites = [[], False] # should_hidden = False
 	obtains = []
-	invis_tiles = []
 
 	for item in items:
-		if isinstance(item, InvisTile):
-			invis_tiles.append(item)
-
 		collide, obtainable = item.test_player_collision(player_rect)
+
+		if isinstance(item, InvisTile):
+			invis_tile_sprites[0].append(item)
+
+			if collide and not invis_tile_sprites[1]:
+				invis_tile_sprites[1] = True
+		else:
+			item_sprites.append(item)
 
 		if collide and obtainable:
 			obtains.append(item)
-			continue
 
-		if not isinstance(item, InvisTile):
-			item.render(display, scroll)
+	render = lambda sprites: foreach(lambda sprite: sprite.render(display, scroll), sprites)
 
-	for tile in invis_tiles:
-		tile.render(display, scroll)
+	foreach(lambda sprite: sprite.set_visibility(invis_tile_sprites[1]), invis_tile_sprites[0])
+
+	if invis_tile_sprites[1]:
+		render(invis_tile_sprites[0])
+
+	render(item_sprites)
+
+	if not invis_tile_sprites[1]:
+		render(invis_tile_sprites[0])
 
 	return obtains
 
@@ -110,27 +122,31 @@ class Spring(Prop):
 class InvisTile(Prop):
 	def __init__(self, pos, size, sprite_offset):
 		super().__init__(pos, size, sprite_offset)
-		self.should_invis = False
-		self.sprite = pygame.image.load(sprites_root + 'invis-tile/invis-tile_0.png')
+		self.should_hide = False
+		self.hidden_sprite = pygame.image.load(sprites_root + 'invis-tile/invis-tile-hidden.png')
+		self.visible_sprite = pygame.image.load(sprites_root + 'invis-tile/invis-tile-visible.png')
 
 	def test_player_collision(self, player_rect):
-		res = self.rect.colliderect(player_rect)
-		self.should_invis = res
+		detect_rect = self.rect.copy()
+		detect_rect.width += 32
+		res = detect_rect.colliderect(player_rect)
+		self.should_hide = not res
 
 		if res:
 			self.on_player_collide(player_rect)
 
 		return res, self.obtainable
 
+	def set_visibility(self, should_hide):
+		self.should_hide = should_hide
+
 	def render(self, display, scroll):
 		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
 		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
-		if self.should_invis:
-			return
-
-		display.blit(self.sprite, (self.rect.x - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
-		display.blit(self.sprite, (self.rect.x + 16 - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
-		display.blit(self.sprite, (self.rect.x + 32 - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
+		sprite = self.hidden_sprite if self.should_hide else self.visible_sprite
+		display.blit(sprite, (self.rect.x - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
+		display.blit(sprite, (self.rect.x + 16 - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
+		display.blit(sprite, (self.rect.x + 32 - scroll[0] - self.sprite_offset[0], self.rect.y - scroll[1] - self.sprite_offset[1]))
 
 
 

@@ -16,11 +16,11 @@ enemies_dict = {
 }
 
 items_dict = {
-	'4': lambda pos: Cherry((pos[0] - 3, pos[1]), (16, 16), (2, 2)),
-	'6': lambda pos: Spring((pos[0] - 3, pos[1] + 13), (16, 8), (0, 8)),
-	'7': lambda pos: InvisTile((pos[0] - 4, pos[1] + 5), (16, 16), (0, 0)),
-	'8': lambda pos: Weed((pos[0] - 3, pos[1] + 5), (16, 16), (0, 0)),
-	'9': lambda pos: Gem((pos[0] - 3, pos[1] + 2), (15, 13), (0, 0))
+	'4': lambda pos: Cherry((pos[0], pos[1]), (16, 16), (2, 2)),
+	'6': lambda pos: Spring((pos[0], pos[1] + 13), (16, 8), (0, 8)),
+	'7': lambda pos: InvisTile((pos[0], pos[1] + 5), (16, 16), (0, 0)),
+	'8': lambda pos: Weed((pos[0], pos[1] + 5), (16, 16), (0, 0)),
+	'9': lambda pos: Gem((pos[0], pos[1] + 6), (15, 13), (0, 0))
 }
 
 def load_entity_map(path):
