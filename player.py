@@ -50,6 +50,7 @@ class Player:
 		add_listener("On Spring Collide", lambda _: self.jump(7))
 		add_listener("On Crate Broken", lambda _: self.jump(4))
 		add_listener("On Weed Obtained", lambda _: self.enable_double_jump())
+		add_listener("Boss Damaged", lambda _: self.jump(4))
 
 	def handle_input(self, event):
 		if event.type == KEYDOWN:

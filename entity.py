@@ -12,7 +12,8 @@ from item import *
 
 
 enemies_dict = {
-	'1': lambda pos: Opossum((pos[0] - 0, pos[1] - 5))
+	'1': lambda pos: Opossum((pos[0] - 0, pos[1] - 5)),
+	'#': lambda pos: Eagle((pos[0] - 0, pos[1] + 1), (32, 20), (0, 18))
 }
 
 items_dict = {
@@ -20,7 +21,8 @@ items_dict = {
 	'6': lambda pos: Spring((pos[0], pos[1] + 13), (16, 8), (0, 8)),
 	'7': lambda pos: InvisTile((pos[0], pos[1] + 5), (16, 16), (0, 0)),
 	'8': lambda pos: Weed((pos[0], pos[1] + 5), (16, 16), (0, 0)),
-	'9': lambda pos: Gem((pos[0], pos[1] + 6), (15, 13), (0, 0))
+	'9': lambda pos: Gem((pos[0], pos[1] + 6), (15, 13), (0, 0)),
+	'/': lambda pos: BossEnterZone((pos[0], pos[1] + 4), (16, 16), (0, 0)),
 }
 
 def load_entity_map(path):
@@ -32,6 +34,7 @@ def load_entity_map(path):
 
 def gen_entities(entities_map, display, scroll):
 	enemies = []
+	boss = None
 	items = []
 
 	y = 0
@@ -42,7 +45,10 @@ def gen_entities(entities_map, display, scroll):
 			scrolledPos = (pos[0] - scroll[0], pos[1] - scroll[1])
 			
 			if entity in enemies_dict:
-				enemies.append(enemies_dict[entity](scrolledPos))
+				if entity == '#':
+					boss = enemies_dict[entity](scrolledPos)
+				else:
+					enemies.append(enemies_dict[entity](scrolledPos))
 
 			elif entity in items_dict:
 				items.append(items_dict[entity](scrolledPos))
@@ -51,4 +57,4 @@ def gen_entities(entities_map, display, scroll):
 
 		y += 1
 
-	return enemies, items
+	return enemies, boss, items

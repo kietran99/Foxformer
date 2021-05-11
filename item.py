@@ -88,6 +88,18 @@ class Gem(Item):
 		trigger("Gem Obtained", 0)
 		trigger("Rare Item Obtained", (self.rect.x, self.rect.y))
 
+class BossEnterZone(Item):
+	def __init__(self, pos, size, sprite_offset):
+		super().__init__(pos, (size[0] * 30, size[1]), sprite_offset)
+
+	def on_player_collide(self, player_rect):
+		trigger("Boss Zone Entered", 0)
+
+	def render(self, display, scroll):
+		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
+		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
+		pass
+
 
 
 

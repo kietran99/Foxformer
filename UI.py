@@ -66,7 +66,7 @@ class UICanvas:
 	def __init__(self):
 		self.cherry_icon = pygame.image.load(sprites_root + 'cherry/cherry_3.png')
 		self.cherry_icon_pos = (3, 3)
-		self.n_cherries_text = Text('0', 48, (255, 255, 255), (140, 70), True)
+		self.n_cherries_text = Text('0', 48, (255, 255, 255), (140, 60), True)
 
 		self.gem_active_states = [False, False, False]
 		self.gem_inactive_icon = pygame.image.load(sprites_root + 'UI/gem-inactive-icon.png')
