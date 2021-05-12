@@ -95,11 +95,7 @@ class Player:
 				self.flip = player_movement[0] < 0
 				self.action, self.frame = change_action(self.action, self.frame, RUN)
 			else:
-				self.action, self.frame = change_action(self.action, self.frame, IDLE)
-
-		self.frame = (self.frame + 1) if self.frame < (len(animation_db[self.action]) - 1) else 0
-		player_img_id = animation_db[self.action][self.frame]
-		self.sprite = animation_frames[player_img_id]
+				self.action, self.frame = change_action(self.action, self.frame, IDLE)		
 
 	def move(self, movement, tiles):
 		collision_types = { 'top': False, 'bottom': False, 'right': False, 'left': False }
@@ -151,6 +147,11 @@ class Player:
 	def render(self, display, scroll):
 		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
 		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
+
+
+		self.frame = (self.frame + 1) if self.frame < (len(animation_db[self.action]) - 1) else 0
+		player_img_id = animation_db[self.action][self.frame]
+		self.sprite = animation_frames[player_img_id]
 		player_pos = (self.rect.x - scroll[0] - PLAYER_SPRITE_OFFSET[0], self.rect.y - scroll[1] - PLAYER_SPRITE_OFFSET[1])
 		display.blit(pygame.transform.flip(self.sprite, self.flip, False), player_pos)
 

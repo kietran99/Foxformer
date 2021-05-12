@@ -3,7 +3,9 @@ from pygame.locals import *
 
 from global_path import *
 from config import *
-from event_channel import add_listener
+from event_channel import add_listener, trigger
+
+from map import render_bg
 
 FONT_PATH = 'fonts/VCR_OSD_MONO_1.001.ttf'
 
@@ -109,4 +111,67 @@ class UICanvas:
 
 		canvas = pygame.Surface(WINDOW_SIZE, SRCALPHA)
 		self.n_cherries_text.render(canvas)
+		window.blit(canvas, (0, 0))
+
+class MainMenu:
+	def __init__(self, display):
+		self.display = display
+		self.text_size = 64
+		self.text_color = (211, 27, 82)
+		self.new_game_text = Text("New Game (N)", self.text_size, self.text_color, (600, 400), False)
+		self.option_text =   Text("Option   (O)", self.text_size, self.text_color, (600, 500), False)
+		self.about_text =    Text("About    (A)", self.text_size, self.text_color, (600, 600), False)
+		self.exit_text =     Text("Exit     (X)", self.text_size, self.text_color, (600, 700), False)
+		
+		self.is_about = False
+		self.about_content_text_0 = Text('Art by Ansimuz and Kietran99', self.text_size, self.text_color, (600, 400), False)
+		self.about_content_text_1 = Text('Music by Pascal Belisle', self.text_size, self.text_color, (600, 500), False)
+		self.return_text = Text("Return     (R)", self.text_size, self.text_color, (600, 700), False)
+
+		self.is_option = False
+		self.option_content_text = Text("NOTHING HAHAHA", self.text_size + 16, self.text_color, (600, 400), False)
+
+	def handle_input(self, event):
+		if event.type != KEYDOWN:
+			return
+
+		if event.key == K_n:
+			trigger("New Game", 0)
+
+		elif event.key == K_x:
+			trigger("Exit Game", 0)
+
+		elif event.key == K_r:
+			if self.is_about:
+				self.is_about = False
+			elif self.is_option:
+				self.is_option = False
+
+		elif not self.is_about and event.key == K_a:
+			self.is_about = True
+
+		elif not self.is_option and event.key == K_o:
+			self.is_option = True
+
+	def render(self, window):
+		render_bg(self.display, (0, 0))
+	
+		surface = pygame.transform.scale(self.display, WINDOW_SIZE)
+		window.blit(surface, (0, 0))
+
+		canvas = pygame.Surface(WINDOW_SIZE, SRCALPHA)
+
+		if self.is_about:
+			self.about_content_text_0.render(canvas)
+			self.about_content_text_1.render(canvas)
+			self.return_text.render(canvas)
+		elif self.is_option:
+			self.option_content_text.render(canvas)
+			self.return_text.render(canvas)
+		else:
+			self.new_game_text.render(canvas)
+			self.option_text.render(canvas)
+			self.about_text.render(canvas)
+			self.exit_text.render(canvas)
+
 		window.blit(canvas, (0, 0))
