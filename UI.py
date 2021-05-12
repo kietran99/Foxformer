@@ -116,12 +116,15 @@ class UICanvas:
 class MainMenu:
 	def __init__(self, display):
 		self.display = display
-		self.text_size = 64
-		self.text_color = (211, 27, 82)
-		self.new_game_text = Text("New Game (N)", self.text_size, self.text_color, (600, 400), False)
-		self.option_text =   Text("Option   (O)", self.text_size, self.text_color, (600, 500), False)
-		self.about_text =    Text("About    (A)", self.text_size, self.text_color, (600, 600), False)
-		self.exit_text =     Text("Exit     (X)", self.text_size, self.text_color, (600, 700), False)
+		self.text_size = 48
+		self.text_color = (195, 165, 39)
+		self.middle = pygame.image.load(env_root + "middle.png")
+
+		self.container = pygame.image.load(sprites_root + "UI/panel.png")
+		self.new_game_text = Text("New Game (N)", self.text_size, self.text_color, (600, 300), False)
+		self.option_text =   Text("Option   (O)", self.text_size, self.text_color, (600, 400), False)
+		self.about_text =    Text("About    (A)", self.text_size, self.text_color, (600, 500), False)
+		self.exit_text =     Text("Exit     (X)", self.text_size, self.text_color, (600, 600), False)
 		
 		self.is_about = False
 		self.about_content_text_0 = Text('Art by Ansimuz and Kietran99', self.text_size, self.text_color, (600, 400), False)
@@ -155,6 +158,10 @@ class MainMenu:
 
 	def render(self, window):
 		render_bg(self.display, (0, 0))
+
+		# self.display.blit(self.middle, (-10, 30))
+		# self.display.blit(self.middle, (self.middle.get_width() - 10, 30))
+		self.display.blit(self.container, (70, 50))
 	
 		surface = pygame.transform.scale(self.display, WINDOW_SIZE)
 		window.blit(surface, (0, 0))
@@ -173,5 +180,5 @@ class MainMenu:
 			self.option_text.render(canvas)
 			self.about_text.render(canvas)
 			self.exit_text.render(canvas)
-
+		
 		window.blit(canvas, (0, 0))

@@ -14,6 +14,8 @@ DIRT_VAR = '1'
 NONE = '0'
 BG_LEN = 4
 BG_MOVE_MODIFIER = 0.25
+MID_MOVE_MODIFIER = 0.5
+MID_Y = 80
 CAMERA_SMOOTH_FACTOR = 10
 
 def load_map(path):
@@ -28,6 +30,7 @@ def collision_test(rect, tiles):
 
 def render_bg(display, scroll):
 	foreach(lambda i: display.blit(bg_img, ((i - 1) * bg_img.get_width() - scroll[0] * BG_MOVE_MODIFIER, 0)), range(BG_LEN + 1))
+	foreach(lambda i: display.blit(middle_img, ((i - 1) * middle_img.get_width() - scroll[0] * MID_MOVE_MODIFIER, MID_Y - scroll[1] * MID_MOVE_MODIFIER)), range((BG_LEN + 1) * 2))
 
 def render_map(game_map, display, scroll):
 	tile_rects = []
@@ -73,3 +76,4 @@ tile_dict = {
 }
 
 bg_img = pygame.image.load(env_root + 'back.png')
+middle_img = pygame.image.load(env_root + 'middle.png')
