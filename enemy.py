@@ -23,13 +23,13 @@ GET_KILLED = 2
 
 
 
-def enemies_update(enemies, tile_rects, player_rect, display, scroll):
+def enemies_update(enemies, tile_rects, player_rect, is_dashing, display, scroll):
 	killed_player = False
 	dead_enemies = []
 
 	for enemy in enemies:
 		enemy.update(tile_rects)
-		collision_res = enemy.test_player_collision(player_rect)
+		collision_res = enemy.test_player_collision(player_rect, is_dashing)
 		if collision_res == KILLED_PLAYER:
 			# trigger("Game Over", 0)	
 			killed_player = True
@@ -68,12 +68,12 @@ class Opossum:
 		if not collision_test(ground_check_rect, tiles):
 			self.move_dir_mult *= -1
 
-	def test_player_collision(self, player_rect):
+	def test_player_collision(self, player_rect, is_dashing):
 		if not self.rect.colliderect(player_rect):
 			return NONE
 
 		cropped_rect = self.rect.clip(player_rect)
-		killed_player = cropped_rect.width < cropped_rect.height
+		killed_player = cropped_rect.width < cropped_rect.height and not is_dashing
 			
 		if not killed_player:
 			trigger("Enemy Killed", (self.rect.x, self.rect.y))
@@ -153,7 +153,7 @@ class Eagle:
 		if self.elapsed_atk_cooldown > 0:
 			self.elapsed_atk_cooldown -= DELTA
 
-	def test_player_collision(self, player_rect):
+	def test_player_collision(self, player_rect, is_dashing):
 		if self.elapsed_dmg_cooldown > 0:
 			self.elapsed_dmg_cooldown -= DELTA
 			return
@@ -169,11 +169,11 @@ class Eagle:
 		if not self.rect.colliderect(player_rect):
 			return NONE
 
-		if player_rect.bottom > self.rect.bottom:
+		if player_rect.bottom > self.rect.bottom and not is_dashing:
 			return KILLED_PLAYER
 
 		cropped_rect = self.rect.clip(player_rect)
-		killed_player = cropped_rect.width < cropped_rect.height
+		killed_player = cropped_rect.width < cropped_rect.height and not is_dashing
 		
 		if not killed_player:
 			self.hp -= 1

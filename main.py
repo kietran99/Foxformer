@@ -29,7 +29,7 @@ display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTI
 
 pygame.mixer.music.load('audio/bgm.ogg')
 pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.0)
+pygame.mixer.music.set_volume(0.2)
 
 class MainGame:
 	def __init__(self, window, display):
@@ -138,7 +138,7 @@ class MainGame:
 
 			self.player.try_move(tile_rects)
 
-			dead_enemies, killed_player = enemies_update(self.enemies, tile_rects, self.player.rect, self.display, scroll)
+			dead_enemies, killed_player = enemies_update(self.enemies, tile_rects, self.player.rect, self.player.elapsed_dash_time > 0.0, self.display, scroll)
 
 			if killed_player:
 				self.end_game_menu_active = True

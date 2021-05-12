@@ -201,3 +201,12 @@ class Weed(Quirk):
 	def on_player_collide(self, player_rect):
 		trigger("On Weed Obtained", 0)
 		trigger("Rare Item Obtained", (self.rect.x, self.rect.y))
+
+class Pipe(Quirk):
+	def __init__(self, pos, size, sprite_offset):
+		super().__init__(pos, size, sprite_offset)
+		self.anim_db['OBTAIN'] = load_anim(sprites_root + 'pipe', [7, 7, 7, 7])
+
+	def on_player_collide(self, player_rect):
+		trigger("On Pipe Obtained", 0)
+		trigger("Rare Item Obtained", (self.rect.x, self.rect.y))

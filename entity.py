@@ -21,6 +21,7 @@ items_dict = {
 	'6': lambda pos: Spring((pos[0], pos[1] + 13), (16, 8), (0, 8)),
 	'7': lambda pos: InvisTile((pos[0], pos[1] + 5), (16, 16), (0, 0)),
 	'8': lambda pos: Weed((pos[0], pos[1] + 5), (16, 16), (0, 0)),
+	'p': lambda pos: Pipe((pos[0], pos[1] + 5), (16, 16), (0, 0)),
 	'9': lambda pos: Gem((pos[0], pos[1] + 6), (15, 13), (0, 0)),
 	'/': lambda pos: BossEnterZone((pos[0], pos[1] + 4), (16, 16), (0, 0)),
 }

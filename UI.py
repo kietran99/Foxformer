@@ -80,9 +80,15 @@ class UICanvas:
 		self.weed_active_icon = pygame.image.load(sprites_root + 'UI/weed-active-icon.png')
 		self.weed_icon_pos = (280, 6)
 
+		self.is_pipe_active = False
+		self.pipe_inactive_icon = pygame.image.load(sprites_root + 'UI/pipe-inactive-icon.png')
+		self.pipe_active_icon = pygame.image.load(sprites_root + 'UI/pipe-active-icon.png')
+		self.pipe_icon_pos = (260, 6)
+
 		add_listener("Num Cherries Changed", self.on_n_cherries_changed)
 		add_listener("Num Gems Changed", self.on_n_gems_changed)
 		add_listener("On Weed Obtained", self.on_weed_obtained)
+		add_listener("On Pipe Obtained", self.on_pipe_obtained)
 
 	def on_n_cherries_changed(self, n_cherries):
 		self.n_cherries_text.text = str(n_cherries)
@@ -96,6 +102,9 @@ class UICanvas:
 	def on_weed_obtained(self, _):
 		self.is_weed_active = True
 
+	def on_pipe_obtained(self, _):
+		self.is_pipe_active = True
+
 	def render(self, window):
 		display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION), SRCALPHA)
 
@@ -105,6 +114,7 @@ class UICanvas:
 			display.blit(self.gem_active_icon if self.gem_active_states[i] else self.gem_inactive_icon, self.gem_icon_pos_list[i])
 
 		display.blit(self.weed_active_icon if self.is_weed_active else self.weed_inactive_icon, self.weed_icon_pos)
+		display.blit(self.pipe_active_icon if self.is_pipe_active else self.pipe_inactive_icon, self.pipe_icon_pos)
 
 		surface = pygame.transform.scale(display, WINDOW_SIZE)
 		window.blit(surface, (0, 0))

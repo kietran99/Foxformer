@@ -46,10 +46,16 @@ class Player:
 		self.double_jump_enabled = False
 		self.is_second_jump = False
 
+		self.dash_enabled = False
+		self.dash_speed = 8
+		self.dash_time = 0.1
+		self.elapsed_dash_time = 0.0
+
 		add_listener("Enemy Killed", lambda _: self.jump(4))
 		add_listener("On Spring Collide", lambda _: self.jump(7))
 		add_listener("On Crate Broken", lambda _: self.jump(4))
 		add_listener("On Weed Obtained", lambda _: self.enable_double_jump())
+		add_listener("On Pipe Obtained", lambda _: self.enable_dash())
 		add_listener("Boss Damaged", lambda _: self.jump(4))
 
 	def handle_input(self, event):
@@ -60,6 +66,8 @@ class Player:
 				self.moving_left = True
 			if event.key == K_SPACE:
 				self.try_jump()
+			if self.dash_enabled and not self.is_second_jump and event.key == K_LSHIFT and not self.on_ground:
+				self.dash()
 
 		if event.type == KEYUP:
 			if event.key == K_d:
@@ -69,10 +77,16 @@ class Player:
 
 	def try_move(self, tile_rects):
 		player_movement = [0, 0]
-		player_movement[0] += self.move_speed if self.moving_right else 0
-		player_movement[0] -= self.move_speed if self.moving_left else 0
-		player_movement[1] += self.y_momentum
-		self.y_momentum = self.y_momentum + GRAVITY_MOD if self.y_momentum <= MAX_Y_MOMENTUM else MAX_Y_MOMENTUM
+
+		if self.elapsed_dash_time > 0.0:
+			player_movement[0] += self.dash_speed if self.moving_right else 0
+			player_movement[0] -= self.dash_speed if self.moving_left else 0
+			self.elapsed_dash_time -= DELTA
+		else:
+			player_movement[0] += self.move_speed if self.moving_right else 0
+			player_movement[0] -= self.move_speed if self.moving_left else 0
+			player_movement[1] += self.y_momentum
+			self.y_momentum = self.y_momentum + GRAVITY_MOD if self.y_momentum <= MAX_Y_MOMENTUM else MAX_Y_MOMENTUM
 
 		collisions = self.move(player_movement, tile_rects)
 		
@@ -89,7 +103,7 @@ class Player:
 
 		if not self.on_ground:
 			self.flip = player_movement[0] < 0
-			self.action, self.frame = change_action(self.action, self.frame, JUMP)
+			self.action, self.frame = change_action(self.action, self.frame, JUMP if self.elapsed_dash_time <= 0.0 else DASH)
 		else:
 			if player_movement[0] != 0:
 				self.flip = player_movement[0] < 0
@@ -144,10 +158,15 @@ class Player:
 	def enable_double_jump(self):
 		self.double_jump_enabled = True
 
+	def enable_dash(self):
+		self.dash_enabled = True
+
+	def dash(self):
+		self.elapsed_dash_time = self.dash_time
+
 	def render(self, display, scroll):
 		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
 		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
-
 
 		self.frame = (self.frame + 1) if self.frame < (len(animation_db[self.action]) - 1) else 0
 		player_img_id = animation_db[self.action][self.frame]
@@ -158,9 +177,11 @@ class Player:
 IDLE = 'idle'
 RUN = 'run'
 JUMP = 'jump'
+DASH = 'dash'
 
 animation_db = {}
 animation_db[IDLE] = load_anim(sprites_root + 'player/idle', [7, 7, 7, 7])
 animation_db[RUN] = load_anim(sprites_root + 'player/run', [5, 5, 5, 5, 5, 5])
 animation_db[JUMP] = load_anim(sprites_root + 'player/jump', [7])
+animation_db[DASH] = load_anim(sprites_root + 'player/dash', [5, 5])
 
