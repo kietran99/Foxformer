@@ -64,12 +64,17 @@ class MainGame:
 		add_listener("Boss Zone Entered", self.spawn_boss)
 		add_listener("New Game", self.new_game)
 		add_listener("Exit Game", self.exit_game)
+		add_listener("Play Again", self.play_again)
+		add_listener("Boss Killed", self.claim_victory)
 		self.game_manager = GameManager()
 		self.player = Player()
 		self.enemies, self.boss, self.items = gen_entities(self.entities_map, self.display, calc_scroll(self.display, self.player)[1])
 		self.UI = UICanvas()
 		self.vfxManager = VFXManager()
 		self.main_menu = MainMenu(display)
+		self.end_game_menu = EndGameMenu()
+		self.end_game_menu_active = False
+		self.has_won = False
 
 	def spawn_boss(self, _):
 		self.enemies.append(self.boss)
@@ -81,9 +86,15 @@ class MainGame:
 		pygame.quit()
 		sys.exit()
 
+	def play_again(self, _):
+		self.reset_game()
+
+	def claim_victory(self, _):
+		self.has_won = True
+
 	def game_loop(self):
 		while True:
-			self.display.fill((146, 244, 255))
+			self.display.fill((0, 0, 0))
 
 			if not self.is_in_game:
 				for event in pygame.event.get():
@@ -92,9 +103,6 @@ class MainGame:
 						sys.exit()
 
 					self.main_menu.handle_input(event)
-
-				surface = pygame.transform.scale(self.display, WINDOW_SIZE)
-				self.window.blit(surface, (0, 0))
 				
 				self.main_menu.render(window)
 
@@ -103,8 +111,8 @@ class MainGame:
 
 				continue
 
-			if self.player.rect.y > MAP_BOTTOM:
-				self.reset_game()
+			if self.player.rect.y > MAP_BOTTOM and not self.end_game_menu_active:
+				self.end_game_menu_active = True
 				continue
 
 			self.player.true_scroll, scroll = calc_scroll(self.display, self.player)
@@ -113,12 +121,27 @@ class MainGame:
 			bind_render_input(render_bg)
 			tile_rects = render_map(self.game_map, self.display, scroll)
 
+			if self.end_game_menu_active or self.has_won:
+				for event in pygame.event.get():
+					if event.type == QUIT:
+						pygame.quit()
+						sys.exit()
+
+					self.end_game_menu.handle_input(event)
+
+				self.end_game_menu.render(self.display, self.window, self.has_won, self.game_manager.n_cherries, self.game_manager.n_gems)
+
+				pygame.display.update()
+				clock.tick(FPS)
+
+				continue
+
 			self.player.try_move(tile_rects)
 
 			dead_enemies, killed_player = enemies_update(self.enemies, tile_rects, self.player.rect, self.display, scroll)
 
 			if killed_player:
-				self.reset_game()
+				self.end_game_menu_active = True
 				continue
 
 			foreach(lambda killed: self.enemies.remove(killed), dead_enemies)

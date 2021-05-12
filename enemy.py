@@ -186,6 +186,7 @@ class Eagle:
 
 			if self.hp == 0:
 				trigger("Enemy Killed", (self.rect.x, self.rect.y))
+				trigger("Boss Killed", 0)
 			else:
 				return NONE
 			
@@ -195,9 +196,9 @@ class Eagle:
 		# debug_rect = pygame.Rect(self.rect.x - scroll[0], self.rect.y - scroll[1], self.rect.width, self.rect.height)
 		# pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
 
-		if self.atk_target != None:
-			debug_rect = pygame.Rect(self.atk_target.x - scroll[0], self.atk_target.y - scroll[1], self.atk_target.width, self.atk_target.height)
-			pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
+		# if self.atk_target != None:
+		# 	debug_rect = pygame.Rect(self.atk_target.x - scroll[0], self.atk_target.y - scroll[1], self.atk_target.width, self.atk_target.height)
+		# 	pygame.draw.rect(display, (255, 0, 0), debug_rect, 1)
 
 		self.flip = self.move_dir_mult > 0
 

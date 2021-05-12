@@ -100,7 +100,7 @@ class UICanvas:
 		display = pygame.Surface((WINDOW_SIZE[0] / RESOLUTION, WINDOW_SIZE[1] / RESOLUTION), SRCALPHA)
 
 		display.blit(self.cherry_icon, self.cherry_icon_pos)
-		# display.blit(self.gem_icon, self.gem_icon_pos)
+		
 		for i in range(len(self.gem_active_states)):
 			display.blit(self.gem_active_icon if self.gem_active_states[i] else self.gem_inactive_icon, self.gem_icon_pos_list[i])
 
@@ -118,7 +118,6 @@ class MainMenu:
 		self.display = display
 		self.text_size = 48
 		self.text_color = (195, 165, 39)
-		self.middle = pygame.image.load(env_root + "middle.png")
 
 		self.container = pygame.image.load(sprites_root + "UI/panel.png")
 		self.new_game_text = Text("New Game (N)", self.text_size, self.text_color, (600, 300), False)
@@ -127,12 +126,12 @@ class MainMenu:
 		self.exit_text =     Text("Exit     (X)", self.text_size, self.text_color, (600, 600), False)
 		
 		self.is_about = False
-		self.about_content_text_0 = Text('Art by Ansimuz and Kietran99', self.text_size, self.text_color, (600, 400), False)
-		self.about_content_text_1 = Text('Music by Pascal Belisle', self.text_size, self.text_color, (600, 500), False)
+		self.about_content_text_0 = Text('Art by Ansimuz and Kietran99', self.text_size, self.text_color, (600, 400), True)
+		self.about_content_text_1 = Text('Music by Pascal Belisle', self.text_size, self.text_color, (600, 500), True)
 		self.return_text = Text("Return     (R)", self.text_size, self.text_color, (600, 700), False)
 
 		self.is_option = False
-		self.option_content_text = Text("NOTHING HAHAHA", self.text_size + 16, self.text_color, (600, 400), False)
+		self.option_content_text = Text("NOTHING HAHAHA", self.text_size + 16, self.text_color, (600, 400), True)
 
 	def handle_input(self, event):
 		if event.type != KEYDOWN:
@@ -159,9 +158,8 @@ class MainMenu:
 	def render(self, window):
 		render_bg(self.display, (0, 0))
 
-		# self.display.blit(self.middle, (-10, 30))
-		# self.display.blit(self.middle, (self.middle.get_width() - 10, 30))
-		self.display.blit(self.container, (70, 50))
+		if not self.is_about and not self.is_option:
+			self.display.blit(self.container, (70, 50))
 	
 		surface = pygame.transform.scale(self.display, WINDOW_SIZE)
 		window.blit(surface, (0, 0))
@@ -180,5 +178,64 @@ class MainMenu:
 			self.option_text.render(canvas)
 			self.about_text.render(canvas)
 			self.exit_text.render(canvas)
+		
+		window.blit(canvas, (0, 0))
+
+class EndGameMenu:
+	def __init__(self):
+		self.container = pygame.image.load(sprites_root + "UI/panel.png")
+		self.container_pos = (70, 40)
+
+		self.won_lose_text_size = 64
+		self.won_text = Text('CONGRATS', self.won_lose_text_size, (53, 235, 127), (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2 - 180), True)
+		self.lose_text = Text('HAHAHA!!', self.won_lose_text_size, (189, 25, 25), (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2 - 180), True)
+
+		self.cherry_icon = pygame.image.load(sprites_root + 'cherry/cherry_3.png')
+		self.cherry_icon_pos = (120, 70)
+		self.n_cherries_text = Text('0', 64, (255, 255, 255), (WINDOW_SIZE[0] / 2 + 10, WINDOW_SIZE[1] / 2 - 85), True)
+
+		self.gem_inactive_icon = pygame.image.load(sprites_root + 'UI/gem-inactive-icon.png')
+		self.gem_active_icon = pygame.image.load(sprites_root + 'UI/gem-active-icon.png')
+		gem_icon_y = 100
+		gem_icon_start_x = 118
+		self.gem_icon_pos_list = [(gem_icon_start_x, gem_icon_y), (gem_icon_start_x + 24, gem_icon_y), (gem_icon_start_x + 48, gem_icon_y)]
+
+		self.text_size = 32
+		self.play_again_text = Text("Play Again (P)", self.text_size, (230, 233, 56), (600, 560), True)
+		self.exit_text =     Text("Exit (X)", self.text_size, (189, 25, 25), (600, 610), True)
+
+	def handle_input(self, event):
+		if event.type != KEYDOWN:
+			return
+
+		if event.key == K_p:
+			trigger("Play Again", 0)
+
+		elif event.key == K_x:
+			trigger("Exit Game", 0)
+
+	def render(self, display, window, has_won, n_cherries, n_gems):
+		display.blit(self.container, self.container_pos)
+
+		display.blit(self.cherry_icon, self.cherry_icon_pos)
+	
+		gem_active_states = [i < n_gems for i in range(3)]
+		for i in range(len(gem_active_states)):
+			display.blit(self.gem_active_icon if gem_active_states[i] else self.gem_inactive_icon, self.gem_icon_pos_list[i])
+
+		surface = pygame.transform.scale(display, WINDOW_SIZE)
+		window.blit(surface, (0, 0))
+
+		canvas = pygame.Surface(WINDOW_SIZE, SRCALPHA)
+
+		if has_won:
+			self.won_text.render(canvas)
+		else:
+			self.lose_text.render(canvas)
+
+		self.n_cherries_text.text = str(n_cherries)
+		self.n_cherries_text.render(canvas)
+		self.play_again_text.render(canvas)
+		self.exit_text.render(canvas)
 		
 		window.blit(canvas, (0, 0))
